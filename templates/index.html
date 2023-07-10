@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movie Genre Analyzer</title>
+  <style>
+    /* CSS styling for the form and result */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #result {
+      text-align: center;
+      display: none; /* Initially hide the result container */
+    }
+
+    #loading {
+      display: none; /* Initially hide the loading graphic */
+      text-align: center;
+    }
+
+    #loading img {
+      width: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie Genre Analyzer</h1>
+  <form id="analyzeForm" onsubmit="return analyzeDescription(event)">
+    <input type="text" id="descriptionInput" placeholder="Enter movie description">
+    <button type="submit">Analyze</button>
+  </form>
+  <div id="loading"><img src="https://cdn.dribbble.com/users/496301/screenshots/1853238/media/1db4945b0fefbb96fc30c8ce396f8e7c.gif"" alt="Loading..."></div>
+  <div id="result"></div>
+
+  <script>
+    function analyzeDescription(event) {
+      event.preventDefault();
+      
+      var descriptionInput = document.getElementById("descriptionInput");
+      var loadingDiv = document.getElementById("loading");
+      var resultDiv = document.getElementById("result");
+
+      // Show the loading graphic
+      loadingDiv.style.display = "block";
+      resultDiv.style.display = "none";
+
+      // Disable the form inputs
+      descriptionInput.disabled = true;
+
+      // Get the description from the input field
+      var description = descriptionInput.value;
+      
+      // Send the description to the server for analysis
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "/analyze", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          // Hide the loading graphic
+          loadingDiv.style.display = "none";
+
+          // Enable the form inputs
+          descriptionInput.disabled = false;
+
+          if (xhr.status === 200) {
+            // Display the result
+            var result = xhr.responseText;
+            resultDiv.innerHTML = "<h2>Result</h2><p>" + result + "</p>";
+            resultDiv.style.display = "block";
+          } else {
+            // Handle the error case
+            resultDiv.innerHTML = xhr.responseText;
+            resultDiv.style.display = "block";
+          }
+        }
+      };
+      xhr.send("description=" + encodeURIComponent(description));
+    }
+  </script>
+</body>
+</html>
